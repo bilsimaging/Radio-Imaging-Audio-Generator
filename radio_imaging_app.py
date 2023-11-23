@@ -3,6 +3,9 @@ from transformers import AutoProcessor, MusicgenForConditionalGeneration
 import scipy.io.wavfile
 import openai
 import time  # Used for simulating progress
+import torch
+import tensorflow as tf
+
 
 # Streamlit app setup
 st.set_page_config(
