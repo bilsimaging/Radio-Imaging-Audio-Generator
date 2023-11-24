@@ -4,15 +4,16 @@
 ## 📜Description
 The Radio Imaging Audio Generator is a Streamlit-based application designed for radio producers and music creators. It combines OpenAI's GPT models with Facebook's MusicGen technology, enabling the generation of unique audio pieces from user-provided prompts.
 
+### 🌐 Project Continuation and User Involvement
+This app is the next step in our project, following the Custom GPT Radio Imaging and MusicGen AI. It's tailored for radio producers and music creators, offering new levels of creativity and efficiency.
+[GPT] (https://chat.openai.com/g/g-65x53n87E-radio-imaging-musicgen-ai)
+
 ## 🚀 Features
 - Text-prompt-based audio generation for radio imaging.
 - Integration with OpenAI's GPT and Facebook's MusicGen models.
 - User-friendly interface for inputting prompts and API keys.
 - Direct audio playback and download options within the app.
 
-### 🌐 Project Continuation and User Involvement
-This app is the next step in our project, following the Custom GPT Radio Imaging and MusicGen AI. It's tailored for radio producers and music creators, offering new levels of creativity and efficiency.
-[GPT] (https://chat.openai.com/g/g-65x53n87E-radio-imaging-musicgen-ai)
 
 #### 👥 How You Can Contribute
 - **Feedback**: Share your experiences and improvement suggestions.
