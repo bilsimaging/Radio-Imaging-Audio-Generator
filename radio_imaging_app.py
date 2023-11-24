@@ -107,37 +107,48 @@ if st.button("📄 Generate Prompt"):
 
 st.markdown("---")
 
-# Generate Audio Button with Progress Bar - Modified
+# ... [Earlier parts of the script remain unchanged]
+
+# Generate Audio Button with Progress Bar and Load Management
 st.markdown("## 🎶 Generate Audio")
 st.info("🚨 Please be patient as generating audio can take some time. This might take a moment due to resource limits. Feel free to notify me if you encounter any issues.")   
+
 if st.button("▶ Generate Audio"):
     if 'generated_prompt' not in st.session_state or not st.session_state['generated_prompt']:
         st.error("Please generate and approve a prompt before creating audio.")
     else:
         descriptive_text = st.session_state['generated_prompt']
-        with st.spinner("Generating your audio... Please wait, this might take a few moments."):
-            progress_bar = st.progress(0)
-            for i in range(100):
-                time.sleep(0.1)  # Simulate processing
-                progress_bar.progress(i + 1)
-            
-            try:
-                processor = AutoProcessor.from_pretrained("facebook/musicgen-small")
-                musicgen_model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-small")
-                inputs = processor(text=[descriptive_text], padding=True, return_tensors="pt")
-                audio_values = musicgen_model.generate(**inputs, max_new_tokens=512)
-                sampling_rate = musicgen_model.config.audio_encoder.sampling_rate
+        
+        # Placeholder for server load check
+        server_ready_for_audio_generation = True  # Replace with actual server load check logic
 
-                audio_filename = "radio_imaging_output.wav"
-                scipy.io.wavfile.write(audio_filename, rate=sampling_rate, data=audio_values[0, 0].numpy())
-                st.success("Your audio has been successfully created! Below is a description of your audio piece based on the GPT model's understanding:")
-                st.write(descriptive_text)
-                st.audio(audio_filename)
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
-            finally:
-                progress_bar.empty()  # Remove the progress bar after completion
-            
+        if server_ready_for_audio_generation:
+            with st.spinner("Generating your audio... Please wait, this might take a few moments."):
+                progress_bar = st.progress(0)
+                for i in range(100):
+                    time.sleep(0.1)  # Simulate processing
+                    progress_bar.progress(i + 1)
+                
+                try:
+                    processor = AutoProcessor.from_pretrained("facebook/musicgen-small")
+                    musicgen_model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-small")
+                    inputs = processor(text=[descriptive_text], padding=True, return_tensors="pt")
+                    audio_values = musicgen_model.generate(**inputs, max_new_tokens=512)
+                    sampling_rate = musicgen_model.config.audio_encoder.sampling_rate
+
+                    audio_filename = "Bilsimaging_radio_imaging_output.wav"
+                    scipy.io.wavfile.write(audio_filename, rate=sampling_rate, data=audio_values[0, 0].numpy())
+                    st.success("Your audio has been successfully created! Below is a description of your audio piece based on the GPT model's understanding:")
+                    st.write(descriptive_text)
+                    st.audio(audio_filename)
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+                finally:
+                    progress_bar.empty()  # Remove the progress bar after completion
+        else:
+            st.warning("The server is currently busy. Please try generating your audio again later.")
+
+# ... [Rest of the code remains the same]
 
 # Footer and Support Section
 st.markdown("---")
