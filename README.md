@@ -45,6 +45,30 @@ This app is the next step in our project, following the Custom GPT Radio Imaging
 
 ### 🌐 Access the Application
 Experience the Radio Imaging Audio Generator now: Access the Streamlit App here.
+https://radio-imaging-audio-generator.streamlit.app/
+
+### How to Use This Web App?
+To get started with creating your unique audio pieces, follow these simple steps:
+ **1. Enter OpenAI API Key**
+ - In the sidebar, input your **OpenAI API key**. This is essential to access the GPT model for 
+generating audio descriptions.
+ - Don't have an API key? Get one for free [here](https://platform.openai.com/account/apikeys).
+ **2. Select GPT Model**
+ - Choose the desired GPT model from the dropdown in the sidebar. We recommend using 
+**'gpt-3.5-turbo-16k'** for more detailed and rich descriptions.
+ **3. Input Your Detailed Description**
+ - Describe your audio idea in the text area provided. Be as detailed as possible to guide the AI 
+effectively. This could include the mood, style, specific instruments, or any other relevant details.
+ **4. Generate and Review the Prompt**
+ - Click on **' Generate Prompt'** to create a descriptive prompt for your audio. Review it to 
+ensure it aligns with your vision.
+ **5. Generate Your Audio**
+ - If you're satisfied with the prompt, hit **'▶ Generate Audio'**. This will process your request 
+and create the audio piece based on the AI-generated description.
+ **6. Playback and Download**
+ - Once generated, you can play the audio directly within the app. If it meets your needs, feel 
+free to download and use it in your projects.
+
 
 ### 💖 Support
 To support further development, consider donating at [Ko-fi](https://ko-fi.com/bilsimaging).
