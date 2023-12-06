@@ -107,7 +107,7 @@ if st.button("📄 Generate Prompt"):
 
 st.markdown("---")
 
-# ... [Earlier parts of the script remain unchanged]
+
 
 # Generate Audio Button with Progress Bar and Load Management
 st.markdown("## 🎶 Generate Audio")
@@ -148,7 +148,7 @@ if st.button("▶ Generate Audio"):
         else:
             st.warning("The server is currently busy. Please try generating your audio again later.")
 
-# ... [Rest of the code remains the same]
+
 
 # Footer and Support Section
 st.markdown("---")
