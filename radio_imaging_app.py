@@ -54,7 +54,7 @@ with st.sidebar:
     openai_api_key = st.text_input("OpenAI API key", type="password", help="Enter your OpenAI API key here.")
     st.caption("*If you don't have an OpenAI API key, get it [here](https://platform.openai.com/account/api-keys).*")
     model = st.selectbox("OpenAI chat model", ("gpt-3.5-turbo", "gpt-3.5-turbo-16k"), help="Select the desired GPT model.")
-    st.markdown("Check out our video tutorials on [YouTube](https://www.youtube.com/channel/UCdDH7T3oa8YMPFV5e79skaA) for helpful guides on using this app!")
+    st.markdown("Check out our video tutorials on [YouTube](https://www.youtube.com/watch?v=2uYKmoP1o2M&list=PLwEbW4bdYBSDe6qAJRFiWGyHSW-JR-B0_) for helpful guides on using this app!")
     st.markdown('''Made with ❤️ by [Bilsimaging](https://bilsimaging.com)''', unsafe_allow_html=True)   
 
 # Guidelines for generating prompt and audio
