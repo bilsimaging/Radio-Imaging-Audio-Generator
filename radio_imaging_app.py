@@ -2,10 +2,13 @@ import streamlit as st
 from transformers import AutoProcessor, MusicgenForConditionalGeneration
 import scipy.io.wavfile
 import openai
+from openai import error as openai_error # Import OpenAI error types
 import time  # Used for simulating progress
 import torch
-import tensorflow as tf
+# import tensorflow as tf # This import is not used, so I'm commenting it out.
 
+# Define a maximum length for the prompt
+MAX_PROMPT_LENGTH = 1000
 
 # Streamlit app setup
 st.set_page_config(
@@ -101,13 +104,30 @@ if st.button("📄 Generate Prompt"):
                     file_name="generated_prompt.txt",
                     mime="text/plain"
                 )
-
+            except openai_error.AuthenticationError:
+                st.error("OpenAI API Key is invalid. Please check your key and try again.")
+            except openai_error.RateLimitError:
+                st.error("OpenAI API rate limit exceeded. Please wait a while and try again or check your usage plan.")
+            except openai_error.APIConnectionError:
+                st.error("Could not connect to OpenAI API. Please check your internet connection and try again.")
+            except openai_error.InvalidRequestError as e:
+                st.error(f"Invalid request to OpenAI API. This might be due to an issue with the prompt content or model parameters. Details: {e}")
             except Exception as e:
-                st.error(f"An error occurred: {e}")
+                st.error(f"An error occurred during prompt generation: {e}")
 
 st.markdown("---")
 
 
+# Cached functions for loading models
+@st.cache_resource
+def load_processor():
+    return AutoProcessor.from_pretrained("facebook/musicgen-small")
+
+@st.cache_resource
+def load_model():
+    # Model will be loaded to GPU if available, otherwise CPU by default with Hugging Face.
+    model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-small")
+    return model
 
 # Generate Audio Button with Progress Bar and Load Management
 st.markdown("## 🎶 Generate Audio")
@@ -118,36 +138,75 @@ if st.button("▶ Generate Audio"):
         st.error("Please generate and approve a prompt before creating audio.")
     else:
         descriptive_text = st.session_state['generated_prompt']
+
+        # ---- Input Validation for descriptive_text ----
+        if not descriptive_text.strip():
+            st.error("The generated prompt is empty. Please generate a new prompt with a valid description.")
+            st.stop() # Stop execution if prompt is empty
+
+        if len(descriptive_text) > MAX_PROMPT_LENGTH:
+            original_length = len(descriptive_text)
+            descriptive_text = descriptive_text[:MAX_PROMPT_LENGTH]
+            st.warning(f"The generated prompt is very long ({original_length} characters). It has been truncated to {MAX_PROMPT_LENGTH} characters to ensure stability. You might want to try generating a more concise prompt for better results.")
+        # ---- End of Input Validation ----
         
-        # Placeholder for server load check
+        # Placeholder for server load check (remains as is)
         server_ready_for_audio_generation = True  # Replace with actual server load check logic
 
         if server_ready_for_audio_generation:
-            with st.spinner("Generating your audio... Please wait, this might take a few moments."):
-                progress_bar = st.progress(0)
-                for i in range(100):
-                    time.sleep(0.1)  # Simulate processing
-                    progress_bar.progress(i + 1)
-                
-                try:
-                    processor = AutoProcessor.from_pretrained("facebook/musicgen-small")
-                    musicgen_model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-small")
-                    inputs = processor(text=[descriptive_text], padding=True, return_tensors="pt")
-                    audio_values = musicgen_model.generate(**inputs, max_new_tokens=512)
-                    sampling_rate = musicgen_model.config.audio_encoder.sampling_rate
+            # GPU Availability Check
+            if torch.cuda.is_available():
+                st.info("Using GPU for audio generation. This may take a few moments.")
+                device = torch.device("cuda")
+            else:
+                st.info("GPU not available. Using CPU for audio generation. This might take significantly longer.")
+                device = torch.device("cpu")
 
+            progress_bar = st.progress(0) # Initialize progress bar here
+            try:
+                with st.spinner("Generating your audio... Please wait, this might take a few moments."):
+                    for i in range(20): # Simulate initial loading/preparation part of progress
+                        time.sleep(0.05)
+                        progress_bar.progress(i + 1)
+
+                    processor = load_processor()
+                    musicgen_model = load_model()
+                    # Ensure model is on the correct device (important if not handled in load_model or by default)
+                    musicgen_model.to(device) 
+
+                    inputs = processor(text=[descriptive_text], padding=True, return_tensors="pt").to(device)
+                    
+                    for i in range(20, 80): # Simulate generation part of progress
+                        time.sleep(0.1) 
+                        progress_bar.progress(i + 1)
+
+                    audio_values = musicgen_model.generate(**inputs, max_new_tokens=512)
+                    
+                    sampling_rate = musicgen_model.config.audio_encoder.sampling_rate
                     audio_filename = "Bilsimaging_radio_imaging_output.wav"
-                    scipy.io.wavfile.write(audio_filename, rate=sampling_rate, data=audio_values[0, 0].numpy())
+                    
+                    # Ensure audio_values are on CPU for scipy writing
+                    scipy.io.wavfile.write(audio_filename, rate=sampling_rate, data=audio_values[0, 0].cpu().numpy())
+
+                    for i in range(80, 101): # Simulate finalization part of progress
+                        time.sleep(0.05)
+                        progress_bar.progress(i + 1)
+
                     st.success("Your audio has been successfully created! Below is a description of your audio piece based on the GPT model's understanding:")
-                    st.write(descriptive_text)
+                    # Display the potentially truncated descriptive_text that was used for generation
+                    st.write(descriptive_text) 
                     st.audio(audio_filename)
-                except Exception as e:
-                    st.error(f"An error occurred: {e}")
-                finally:
-                    progress_bar.empty()  # Remove the progress bar after completion
+
+            except RuntimeError as e:
+                st.error(f"A runtime error occurred during audio generation. This could be due to insufficient memory (especially if using GPU) or other model execution issues. Please try again, perhaps with a shorter prompt or after restarting the application. Error details: {e}")
+            except (IOError, OSError) as e:
+                st.error(f"Failed to save the generated audio file. Please check disk space and permissions. Error details: {e}")
+            except Exception as e:
+                st.error(f"An unexpected error occurred during audio generation: {e}")
+            finally:
+                progress_bar.empty()  # Remove the progress bar after completion or error
         else:
             st.warning("The server is currently busy. Please try generating your audio again later.")
-
 
 
 # Footer and Support Section
